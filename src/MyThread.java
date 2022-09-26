@@ -15,16 +15,11 @@ public class MyThread extends Thread {
 
     @Override
     public void run() {
-        //потоки обязательно должны ждать перед началом работы, пока запустятся все остальные потоки
         double[] dummyArray = this.array.clone();
         this.phaser.arriveAndAwaitAdvance();
         for (int i = this.start; i <= this.end; i++) {
-//            this.array[i] = (this.array[i - 1] * this.array[i + 1]) / 2;
             this.array[i] = (dummyArray[i - 1] + dummyArray[i + 1]) / 2;
-//            this.array[i] = this.array[i] + 1;
         }
-//        System.out.println("Thread " + this.getName() + " " + phaser.getPhase());
-//        this.phaser.arriveAndAwaitAdvance();
         this.phaser.arriveAndDeregister();
     }
 }
