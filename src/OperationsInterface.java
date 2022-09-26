@@ -3,5 +3,6 @@ public interface OperationsInterface {
 
     public void printArray();
 
+    public void setManually(double [] array);
 
 }
