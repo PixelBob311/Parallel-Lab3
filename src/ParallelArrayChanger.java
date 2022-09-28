@@ -1,40 +1,43 @@
+import com.sun.tools.javac.Main;
+
 import java.util.concurrent.Phaser;
 
 public class ParallelArrayChanger extends AbstractArrayChanger {
     Phaser phaser;
-    int threadsCount;
+    MyThread[] threads;
 
     public ParallelArrayChanger(CommonResource res, int iters, int threadsCount, Phaser phaser) {
         super(res, iters);
         this.changerName = "Параллельный метод";
         this.phaser = phaser;
-        this.threadsCount = threadsCount;
+        this.threads = new MyThread[threadsCount];
     }
+//    int start = 1, end;
+//    end = (this.resource.getArray().length - 2) * (i + 1) / this.threadsCount;
+//    threads[i] = new MyThread(start, end, this.iters, phaser, this.resource);
+//    start = end + 1;
 
     @Override
     public void changeArray() {
-        MyThread[] threads = new MyThread[this.threadsCount];
-        //создаем потоки
-        int start = 1, end;
-        for (int i = 0; i < threads.length; i++) {
-            end = (this.resource.getArray().length - 2) * (i + 1) / this.threadsCount;
-            threads[i] = new MyThread(start, end, this.iters, phaser, this.resource);
-            start = end + 1;
-        }
-        phaser.arriveAndAwaitAdvance();
+        this.initThreads();
+        //в этот момент созданные потоки ожидают поток main, чтобы он закончил создание потоков.
+        this.phaser.arriveAndAwaitAdvance();
+    }
 
-
-        long startTime = System.currentTimeMillis();
-        for (int currentIter = 0; currentIter < this.iters; currentIter++) {
-//            System.out.println("currentIter = " + currentIter);
-            ++MyThread.currentIter;
-            //сделать копию результирующего массива и записать на место исходного
-//            double [] clonedArray = this.resource.getArrayDeepClone();
-            phaser.arriveAndAwaitAdvance();
-            this.resource.rewriteCopiedArray();
-            phaser.arriveAndAwaitAdvance();
+    private void initThreads() {
+        int startIndex = 1, endIndex = 1;
+        int elementsPerThread = (int) (this.getResource().getArray().length - 2) / this.threads.length;
+        for (int i = 0; i < this.threads.length; i++) {
+            endIndex = elementsPerThread * (i + 1);
+            if (i == this.threads.length - 1) {
+                endIndex = this.getResource().getArray().length - 1;
+            }
+            this.threads[i] = new MyThread(startIndex, endIndex, this.iters, this.phaser, this.getResource());
+            /*DEBUG INFO*/
+            System.out.println("start = " + startIndex + " end = "
+                    + endIndex + "; Обработает " + (endIndex - startIndex + 1) + " потоков");
+            /*DEBUG INFO*/
+            startIndex = endIndex + 1;
         }
-        long endTime = System.currentTimeMillis();
-        this.timeElapsed = endTime - startTime;
     }
 }

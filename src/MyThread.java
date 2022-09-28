@@ -16,21 +16,20 @@ public class MyThread extends Thread {
         this.resource = resource;
         this.phaser.register();
         this.start();
-        this.phaser.arriveAndAwaitAdvance();
     }
 
     @Override
     public void run() {
+        //первый колокол - ожидание, пока main закончит создание потоков
+        this.phaser.arriveAndAwaitAdvance();
+        //теперь мы ждем, когда создастся цикл в мейне и проинициалазируется текущая итерация в треде
+        this.phaser.arriveAndAwaitAdvance();
         double [] targetArray = this.resource.getArray();
         double [] dummyArray;
         while (currentIter < this.totalIters) {
             dummyArray = this.resource.getCopiedArray();
             for (int i = this.startIndex; i <= this.endIndex; i++) {
                 targetArray[i] = (dummyArray[i - 1] + dummyArray[i + 1]) / 2;
-//                array[i] += 1;
-//                this.target.printArray();
-//                array[i] += Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1);
-//                int t = 1;
             }
             this.phaser.arriveAndAwaitAdvance();
 //            System.out.println(this.getName() + " ended phase " + this.phaser.getPhase());
