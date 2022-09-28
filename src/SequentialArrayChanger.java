@@ -7,13 +7,17 @@ public class SequentialArrayChanger extends AbstractArrayChanger {
     @Override
     public void changeArray() {
         long startTime = System.currentTimeMillis();
+        var sourceArray = this.resource.getArray();
+        var arrayCopy = this.resource.getCopiedArray();
         for (int currentIter = 0; currentIter < this.iters; currentIter++) {
-            var sourceArray = this.resource.getArray();
-            double[] arrayCopy = sourceArray.clone();
+//            sourceArray = this.resource.getArray();
+            arrayCopy = this.resource.getCopiedArray();
             for (int i = 1; i < arrayCopy.length - 1; i++) {
-                arrayCopy[i] = (sourceArray[i - 1] + sourceArray[i + 1]) / 2;
+                sourceArray[i] = (arrayCopy[i - 1] + arrayCopy[i + 1]) / 2;
+//                arrayCopy[i] += 1;
+//                arrayCopy[i] += Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1);
             }
-            this.resource.setManually(arrayCopy);
+            this.resource.rewriteCopiedArray();
         }
         long endTime = System.currentTimeMillis();
         this.timeElapsed = endTime - startTime;
