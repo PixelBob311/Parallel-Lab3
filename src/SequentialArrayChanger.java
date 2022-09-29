@@ -14,7 +14,7 @@ public class SequentialArrayChanger extends AbstractArrayChanger {
             arrayCopy = this.resource.getCopiedArray();
             for (int i = 1; i < arrayCopy.length - 1; i++) {
                 sourceArray[i] = (arrayCopy[i - 1] + arrayCopy[i + 1]) / 2;
-//                arrayCopy[i] += 1;
+//                sourceArray[i] += 1;
 //                arrayCopy[i] += Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1)*Math.sqrt(1);
             }
             this.resource.rewriteCopiedArray();
