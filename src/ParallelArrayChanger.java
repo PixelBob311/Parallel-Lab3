@@ -12,34 +12,27 @@ public class ParallelArrayChanger extends AbstractArrayChanger {
         this.phaser = phaser;
         this.threads = new MyThread[threadsCount];
     }
-//    int start = 1, end;
-//    end = (this.resource.getArray().length - 2) * (i + 1) / this.threadsCount;
-//    threads[i] = new MyThread(start, end, this.iters, phaser, this.resource);
-//    start = end + 1;
 
     @Override
     public void changeArray() {
         this.initThreads();
+        long startTime = System.currentTimeMillis();
         //в этот момент созданные потоки ожидают поток main, чтобы он закончил создание потоков.
         System.out.println("main заканчивает регистрацию потоков");
         this.phaser.arriveAndAwaitAdvance();
         for(int currentIter = 0; currentIter < this.iters; currentIter++){
-//            System.out.println("Отработала фаза № " + this.phaser.getPhase() + " ");
-
             //подождали, пока потоки завершат обработку
             phaser.arriveAndAwaitAdvance();
             //крутанули счетчик MyTrhead
             MyThread.currentIter++;
-//            System.out.println("Iter № " + MyThread.currentIter++);
-
             //подождали все потоки (они тоже должны встать на ожидание)
             phaser.arriveAndAwaitAdvance();
             //переписали копию массива и снова ждем
             this.resource.rewriteCopiedArray();
-
             phaser.arriveAndAwaitAdvance();
         }
-        //здесь не надо делать дерегистер. Это поток main. Он дерегистрится в фале main.
+        long endTime = System.currentTimeMillis();
+        this.timeElapsed = endTime - startTime;
     }
 
     private void initThreads() {
@@ -51,10 +44,6 @@ public class ParallelArrayChanger extends AbstractArrayChanger {
                 endIndex = this.getResource().getArray().length - 2;
             }
             this.threads[i] = new MyThread(startIndex, endIndex, this.iters, this.phaser, this.getResource());
-            /*DEBUG INFO*/
-//            System.out.println("start = " + startIndex + " end = "
-//                    + endIndex + "; Обработает " + (endIndex - startIndex + 1) + " потоков");
-            /*DEBUG INFO*/
             startIndex = endIndex + 1;
         }
     }
